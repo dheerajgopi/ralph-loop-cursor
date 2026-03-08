@@ -1,0 +1,18 @@
+---
+description: "Ralph Loop context - project conventions, patterns, and learnings"
+alwaysApply: true
+---
+
+# Project Context
+
+## Overview
+This project uses the Ralph Loop pattern. Each agent instance works on exactly one task from tasks.md, then exits. A new agent is spawned with fresh context.
+
+## Conventions
+- Tasks are in tasks.md, marked with `- [ ]` (incomplete) or `- [x]` (complete)
+- Work on only the FIRST incomplete task
+- Commit after each successful task
+- Document learnings below after each iteration
+
+## Learnings
+<!-- Agent: append learnings here after each iteration -->
