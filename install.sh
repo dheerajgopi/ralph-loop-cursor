@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+# install.sh — Installs Ralph Loop files into the current project.
+#
+# Usage:
+#   # Piped from GitHub (fetches templates remotely):
+#   curl -fsSL https://raw.githubusercontent.com/dheerajgopi/ralph-loop-cursor/main/install.sh | bash
+#
+#   # Cloned locally (uses local templates/):
+#   git clone <repo-url> /tmp/ralph-loop-cursor
+#   /tmp/ralph-loop-cursor/install.sh [--force]
+#
+# Options:
+#   --force   Overwrite existing files (ralph.sh, tasks.md, ralph.mdc)
 set -euo pipefail
 
 FORCE=false
@@ -8,12 +20,31 @@ for arg in "$@"; do
   esac
 done
 
-# Resolve installer's own directory and templates location
-INSTALLER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATES_DIR="${INSTALLER_DIR}/templates"
 TARGET_DIR="$(pwd)"
 
+# Detect whether the script is running from a local clone or piped via curl.
+# BASH_SOURCE[0] is empty or "/dev/stdin" when piped.
+INSTALLER_SOURCE="${BASH_SOURCE[0]:-}"
+if [ -n "$INSTALLER_SOURCE" ] && [ "$INSTALLER_SOURCE" != "/dev/stdin" ] && [ -f "$INSTALLER_SOURCE" ]; then
+  INSTALLER_DIR="$(cd "$(dirname "$INSTALLER_SOURCE")" && pwd)"
+  TEMPLATES_DIR="${INSTALLER_DIR}/templates"
+  USE_LOCAL=true
+else
+  # Piped mode: fetch templates from GitHub raw URLs.
+  REPO_RAW="https://raw.githubusercontent.com/dheerajgopi/ralph-loop-cursor/main"
+  USE_LOCAL=false
+fi
+
 echo "[ralph-install] Installing Ralph Loop into: $TARGET_DIR"
+
+# Helpers to read a template either from disk or from GitHub.
+read_template() {
+  if [ "$USE_LOCAL" = true ]; then
+    cat "$TEMPLATES_DIR/$1"
+  else
+    curl -fsSL "${REPO_RAW}/templates/$1"
+  fi
+}
 
 # Check: is this a git repo?
 if ! git -C "$TARGET_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
@@ -28,29 +59,29 @@ if ! command -v agent &>/dev/null; then
   echo "  Continuing anyway..."
 fi
 
-# Copy ralph.sh
+# Install ralph.sh
 if [ -f "$TARGET_DIR/ralph.sh" ] && [ "$FORCE" = false ]; then
   echo "[ralph-install] ralph.sh already exists. Use --force to overwrite."
 else
-  cp "$TEMPLATES_DIR/ralph.sh" "$TARGET_DIR/ralph.sh"
+  read_template "ralph.sh" > "$TARGET_DIR/ralph.sh"
   chmod +x "$TARGET_DIR/ralph.sh"
   echo "[ralph-install] Created ralph.sh"
 fi
 
-# Copy tasks.md template
+# Install tasks.md
 if [ -f "$TARGET_DIR/tasks.md" ] && [ "$FORCE" = false ]; then
   echo "[ralph-install] tasks.md already exists. Skipping."
 else
-  cp "$TEMPLATES_DIR/tasks.md" "$TARGET_DIR/tasks.md"
+  read_template "tasks.md" > "$TARGET_DIR/tasks.md"
   echo "[ralph-install] Created tasks.md"
 fi
 
-# Copy .cursor/rules/ralph.mdc
+# Install .cursor/rules/ralph.mdc
 mkdir -p "$TARGET_DIR/.cursor/rules"
 if [ -f "$TARGET_DIR/.cursor/rules/ralph.mdc" ] && [ "$FORCE" = false ]; then
   echo "[ralph-install] .cursor/rules/ralph.mdc already exists. Skipping."
 else
-  cp "$TEMPLATES_DIR/ralph.mdc" "$TARGET_DIR/.cursor/rules/ralph.mdc"
+  read_template "ralph.mdc" > "$TARGET_DIR/.cursor/rules/ralph.mdc"
   echo "[ralph-install] Created .cursor/rules/ralph.mdc"
 fi
 
