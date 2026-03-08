@@ -19,11 +19,11 @@ through a task list until completion.
 cd /path/to/your-project
 
 # Option A: one-liner from GitHub
-curl -fsSL https://raw.githubusercontent.com/<owner>/ralph-cursor/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/<owner>/ralph-loop-cursor/main/install.sh | bash
 
 # Option B: clone and run
 git clone <repo-url> /tmp/ralph-cursor
-/tmp/ralph-cursor/install.sh
+/tmp/ralph-loop-cursor/install.sh
 ```
 
 This creates: `ralph.sh`, `tasks.md`, `.cursor/rules/ralph.mdc`
@@ -39,4 +39,12 @@ This creates: `ralph.sh`, `tasks.md`, `.cursor/rules/ralph.mdc`
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `MAX_ITERATIONS` | `50` | Max loop iterations before stopping |
+| `MAX_RETRIES` | `2` | Max consecutive stalls on the same task before stopping |
 | `CURSOR_API_KEY` | (required) | Cursor API key |
+| `CURSOR_MODEL` | (agent default) | Model to use (e.g. `claude-3-5-sonnet`) |
+
+## Logs
+
+Each run appends to `.ralph/ralph.log`. Per-iteration output is saved to `.ralph/logs/iteration-<N>.log`.
+
+The `.ralph/` directory is gitignored by default.
