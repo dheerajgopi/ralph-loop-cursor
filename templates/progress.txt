@@ -1,0 +1,3 @@
+# Ralph Loop Progress Log
+# Each iteration appends a summary here.
+# Format: [YYYY-MM-DD] [task-id] summary of what was done and learnings.

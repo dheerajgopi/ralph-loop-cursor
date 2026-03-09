@@ -6,13 +6,14 @@ alwaysApply: true
 # Project Context
 
 ## Overview
-This project uses the Ralph Loop pattern. Each agent instance works on exactly one task from tasks.md, then exits. A new agent is spawned with fresh context.
+This project uses the Ralph Loop pattern. Each agent instance works on exactly one task
+from tasks.json, then exits. A new agent is spawned with fresh context.
 
 ## Conventions
-- Tasks are in tasks.md, marked with `- [ ]` (incomplete) or `- [x]` (complete)
-- Work on only the FIRST incomplete task
-- Commit after each successful task
-- Document learnings below after each iteration
+- Tasks are in tasks.json. Work on the FIRST task where `passes: false` (and not blocked/skipped).
+- Mark completion by setting `passes: true` in tasks.json (do not change other fields).
+- Log what you did and any learnings to progress.txt after each task.
+- Commit after each successful task.
 
 ## Learnings
-<!-- Agent: append learnings here after each iteration -->
+<!-- Agent: append reusable patterns and gotchas here after each iteration -->

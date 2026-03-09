@@ -1,0 +1,11 @@
+[
+  {
+    "id": "task-001",
+    "title": "Replace this with your first task after running tasks-init.sh",
+    "acceptanceCriteria": [
+      "Write PLAN.md describing what you want to build",
+      "Run ./tasks-init.sh to auto-generate tasks from your plan"
+    ],
+    "passes": false
+  }
+]

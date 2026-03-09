@@ -10,7 +10,7 @@
 #   /tmp/ralph-loop-cursor/install.sh [--force]
 #
 # Options:
-#   --force   Overwrite existing files (ralph.sh, tasks.md, ralph.mdc)
+#   --force   Overwrite existing files (ralph.sh, tasks-init.sh, tasks.json, progress.txt, ralph.mdc)
 set -euo pipefail
 
 FORCE=false
@@ -59,6 +59,13 @@ if ! command -v agent &>/dev/null; then
   echo "  Continuing anyway..."
 fi
 
+# Check: is jq installed?
+if ! command -v jq &>/dev/null; then
+  echo "[ralph-install] WARNING: 'jq' not found. Required for tasks.json parsing."
+  echo "  Install it with: sudo apt install jq  OR  brew install jq"
+  echo "  Continuing anyway..."
+fi
+
 # Install ralph.sh
 if [ -f "$TARGET_DIR/ralph.sh" ] && [ "$FORCE" = false ]; then
   echo "[ralph-install] ralph.sh already exists. Use --force to overwrite."
@@ -68,12 +75,29 @@ else
   echo "[ralph-install] Created ralph.sh"
 fi
 
-# Install tasks.md
-if [ -f "$TARGET_DIR/tasks.md" ] && [ "$FORCE" = false ]; then
-  echo "[ralph-install] tasks.md already exists. Skipping."
+# Install tasks-init.sh
+if [ -f "$TARGET_DIR/tasks-init.sh" ] && [ "$FORCE" = false ]; then
+  echo "[ralph-install] tasks-init.sh already exists. Use --force to overwrite."
 else
-  read_template "tasks.md" > "$TARGET_DIR/tasks.md"
-  echo "[ralph-install] Created tasks.md"
+  read_template "tasks-init.sh" > "$TARGET_DIR/tasks-init.sh"
+  chmod +x "$TARGET_DIR/tasks-init.sh"
+  echo "[ralph-install] Created tasks-init.sh"
+fi
+
+# Install tasks.json
+if [ -f "$TARGET_DIR/tasks.json" ] && [ "$FORCE" = false ]; then
+  echo "[ralph-install] tasks.json already exists. Skipping."
+else
+  read_template "tasks.json" > "$TARGET_DIR/tasks.json"
+  echo "[ralph-install] Created tasks.json"
+fi
+
+# Install progress.txt
+if [ -f "$TARGET_DIR/progress.txt" ] && [ "$FORCE" = false ]; then
+  echo "[ralph-install] progress.txt already exists. Skipping."
+else
+  read_template "progress.txt" > "$TARGET_DIR/progress.txt"
+  echo "[ralph-install] Created progress.txt"
 fi
 
 # Install .cursor/rules/ralph.mdc
@@ -98,7 +122,8 @@ fi
 
 echo ""
 echo "[ralph-install] Done! Next steps:"
-echo "  1. Edit tasks.md with your tasks"
-echo "  2. Edit .cursor/rules/ralph.mdc with project conventions"
-echo "  3. export CURSOR_API_KEY=your_key"
-echo "  4. ./ralph.sh"
+echo "  1. Write your plan in PLAN.md (free-form markdown describing what to build)"
+echo "  2. Run: ./tasks-init.sh   # converts PLAN.md → tasks.json"
+echo "  3. Edit .cursor/rules/ralph.mdc with project conventions"
+echo "  4. export CURSOR_API_KEY=your_key"
+echo "  5. ./ralph.sh"
