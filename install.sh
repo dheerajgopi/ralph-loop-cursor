@@ -88,7 +88,7 @@ fi
 # Add .ralph/ to .gitignore
 if [ -f "$TARGET_DIR/.gitignore" ]; then
   if ! grep -q '^\\.ralph/' "$TARGET_DIR/.gitignore"; then
-    echo '.ralph/' >> "$TARGET_DIR/.gitignore"
+    printf '\n.ralph/\n' >> "$TARGET_DIR/.gitignore"
     echo "[ralph-install] Added .ralph/ to .gitignore"
   fi
 else
